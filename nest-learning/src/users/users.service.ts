@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateUserDto } from '../dtos/create-user.dto.js';
 
 const USERS = [
   { id: 1, name: 'Ana' },
@@ -20,5 +21,16 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  create(userDto: CreateUserDto) {
+    const maxId = Math.max(0, ...USERS.map((user) => user.id));
+    const newUser = {
+      id: maxId + 1,
+      ...userDto,
+    };
+
+    USERS.push(newUser);
+    return newUser;
   }
 }
