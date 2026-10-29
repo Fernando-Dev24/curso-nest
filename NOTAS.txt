@@ -1,0 +1,23 @@
+ZOD EN NESTJS
+Para poder usar zod para una pipe y validar tanto como Params como Body se tiene que configurar el uso de StandardSchemaValidationPipe en el archivo main.ts
+
+Uso de subrutas
+Una ruta aparte de la principal "/users" se debe de definir antes de que la ruta principal admita la entrada de custom param ":id"
+
+ZOD
+El decorador @Body admite desde la v12 que admita una opcion de schema y se le pase el schema creado mediante zod.
+
+GUARDS
+Un guard es una forma de ejecutar codigo y proteger nuestros endpoints antes de que se ejecuten. Este decorador debe de implementar o heredar de CanActivate. Los guards deben de responder con un true o con un false para saber si la request es rechazada o admitida correspondienteme.
+
+ACLARACION DE CODIGOS DE RESPUESTA
+En API real. Los estados de codigo siguientes hacen lo mismo pero se usan para cados diferentes
+
+1. 401 Unauthorized: No se proporcionaron credenciales válidas para autenticarse.
+2. 403 Forbidden: La identidad puede estar autenticada, pero no tiene permiso para realizar la operación.
+
+
+INTERCEPTORS
+Un Interceptor nos permite resolverlo de forma reutilizable.
+
+En NestJS, los Interceptors son clases que implementan la interfaz NestInterceptor. Pueden ejecutar lógica antes y después de un handler, transformar resultados, gestionar errores o implementar determinados mecanismos de caché.

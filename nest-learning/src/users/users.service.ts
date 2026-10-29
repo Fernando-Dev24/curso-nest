@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from '../dtos/create-user.dto.js';
+import type { CreateUserDto } from '../dtos/create-user.dto.js';
 
 const USERS = [
   { id: 1, name: 'Ana' },
