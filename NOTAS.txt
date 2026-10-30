@@ -21,3 +21,16 @@ INTERCEPTORS
 Un Interceptor nos permite resolverlo de forma reutilizable.
 
 En NestJS, los Interceptors son clases que implementan la interfaz NestInterceptor. Pueden ejecutar lógica antes y después de un handler, transformar resultados, gestionar errores o implementar determinados mecanismos de caché.
+
+RxJS es una biblioteca de programación reactiva basada en observables.
+
+Una promesa representa un resultado asíncrono. Un Observable, en cambio, puede representar una secuencia de valores a lo largo del tiempo y permite componer operaciones mediante operadores.
+
+En los Interceptors de NestJS utilizamos los operadores de RxJS para trabajar con el flujo de ejecución y respuesta.
+
+next.handle() se ejecuta al entrar al Interceptor.
+pipe() se ejecuta al terminar de ejecutarse el controlador
+tap() se ejecuta cuando el controlador devuelve algo
+
+Aclaración
+tap() con una función de next como esta registra emisiones exitosas, pero no necesariamente registra peticiones que terminan con una excepción o sin una emisión. Para medir también esos casos, RxJS ofrece finalize(), que estudiaremos en una mejora posterior.
