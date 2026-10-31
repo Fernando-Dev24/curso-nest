@@ -1,19 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { Task } from './tasks.types.js';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { CreateTaskDto } from './dto/create-task.dto.js';
+import { UpdateTaskDto } from './dto/update-task.dto.js';
 
 @Injectable()
 export class TaskRepository {
-  private tasks: Task[] = [
-    { id: 1, title: 'Completar el ejercicio', isCompleted: false },
-    { id: 2, title: 'Tener mi hora de almuerzo', isCompleted: false },
-    { id: 3, title: 'Completar los avalúos pendientes', isCompleted: true },
-  ];
+  constructor(private readonly prisma: PrismaService) {}
 
   async findAll(): Promise<Task[]> {
-    return this.tasks;
+    return this.prisma.task.findMany();
   }
 
   async findById(id: number): Promise<Task | null> {
-    return this.tasks.find((t) => t.id === id) ?? null;
+    return this.prisma.task.findUnique({ where: { id } });
+  }
+
+  create(data: CreateTaskDto) {
+    return this.prisma.task.create({
+      data: {
+        title: data.title,
+      },
+    });
+  }
+
+  update(id: number, data: UpdateTaskDto) {
+    return this.prisma.task.update({
+      where: { id },
+      data: {
+        ...(data.title !== undefined && { title: data.title }),
+        ...(data.isCompleted !== undefined && {
+          isCompleted: data.isCompleted,
+        }),
+      },
+    });
+  }
+
+  delete(id: number) {
+    return this.prisma.task.delete({ where: { id } });
   }
 }
