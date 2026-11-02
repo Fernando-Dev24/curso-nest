@@ -2,13 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { TaskRepository } from './tasks.repository.js';
 import { CreateTaskDto } from './dto/create-task.dto.js';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
+import type { TaskPaginationDto } from './dto/task-pagination.dto.js';
 
 @Injectable()
 export class TasksService {
   constructor(private readonly taskRepository: TaskRepository) {}
 
-  async findAll() {
-    return await this.taskRepository.findAll();
+  async findAll(pagination: TaskPaginationDto) {
+    return await this.taskRepository.findAll(pagination);
   }
 
   async findById(id: number) {

@@ -9,19 +9,26 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service.js';
 import { Task } from './tasks.types.js';
 import { type CreateTaskDto, createTaskDto } from './dto/create-task.dto.js';
 import { type UpdateTaskDto, updateTaskDto } from './dto/update-task.dto.js';
+import {
+  type TaskPaginationDto,
+  taskPaginationSchema,
+} from './dto/task-pagination.dto.js';
 
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly taskService: TasksService) {}
 
   @Get()
-  async findAll(): Promise<Task[]> {
-    return await this.taskService.findAll();
+  async findAll(
+    @Query({ schema: taskPaginationSchema }) pagination: TaskPaginationDto,
+  ): Promise<Task[]> {
+    return await this.taskService.findAll(pagination);
   }
 
   @Get(':id')
