@@ -10,4 +10,5 @@
  */
 export type * from './models/User.js'
 export type * from './models/Task.js'
+export type * from './models/TaskTransfer.js'
 export type * from './commonInputTypes.js'

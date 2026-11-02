@@ -51,3 +51,8 @@ export type User = Prisma.UserModel
  * 
  */
 export type Task = Prisma.TaskModel
+/**
+ * Model TaskTransfer
+ * 
+ */
+export type TaskTransfer = Prisma.TaskTransferModel

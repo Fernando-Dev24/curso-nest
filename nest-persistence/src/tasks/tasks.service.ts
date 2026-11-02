@@ -3,6 +3,7 @@ import { TaskRepository } from './tasks.repository.js';
 import { CreateTaskDto } from './dto/create-task.dto.js';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
 import type { TaskPaginationDto } from './dto/task-pagination.dto.js';
+import { TransferTasksDto } from './dto/transfer-tasks.dto.js';
 
 @Injectable()
 export class TasksService {
@@ -29,12 +30,14 @@ export class TasksService {
   }
 
   async update(id: number, dto: UpdateTaskDto) {
-    await this.findById(id);
     return await this.taskRepository.update(id, dto);
   }
 
-  async delete(id: number) {
-    await this.findById(id);
+  async delete(id: number): Promise<void> {
     await this.taskRepository.delete(id);
+  }
+
+  transferTasks(dto: TransferTasksDto) {
+    return this.taskRepository.transferTasks(dto);
   }
 }

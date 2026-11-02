@@ -30,3 +30,11 @@ model Task {
 
   @@index([userId])
 }
+
+model TaskTransfer {
+  id         Int      @id @default(autoincrement())
+  fromUserId Int
+  toUserId   Int
+  taskCount  Int
+  createdAt  DateTime @default(now())
+}

@@ -19,6 +19,10 @@ import {
   type TaskPaginationDto,
   taskPaginationSchema,
 } from './dto/task-pagination.dto.js';
+import {
+  type TransferTasksDto,
+  transferTasksSchema,
+} from './dto/transfer-tasks.dto.js';
 
 @Controller('tasks')
 export class TasksController {
@@ -53,5 +57,11 @@ export class TasksController {
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.taskService.delete(id);
+  }
+
+  @Post('transfer')
+  @HttpCode(HttpStatus.OK)
+  transferTasks(@Body({ schema: transferTasksSchema }) body: TransferTasksDto) {
+    return this.taskService.transferTasks(body);
   }
 }

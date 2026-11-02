@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Task } from './tasks.types.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateTaskDto } from './dto/create-task.dto.js';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
 import type { TaskPaginationDto } from './dto/task-pagination.dto.js';
+import { TransferTasksDto } from './dto/transfer-tasks.dto.js';
 
 @Injectable()
 export class TaskRepository {
@@ -72,5 +73,40 @@ export class TaskRepository {
 
   delete(id: number) {
     return this.prisma.task.delete({ where: { id } });
+  }
+
+  async transferTasks(dto: TransferTasksDto) {
+    return this.prisma.$transaction(async (tx) => {
+      const users = await tx.user.findMany({
+        where: {
+          id: {
+            in: [dto.fromUserId, dto.toUserId],
+          },
+        },
+        select: { id: true },
+      });
+
+      if (users.length !== 2) {
+        throw new NotFoundException('Uno de los usuarios no existe.');
+      }
+
+      const result = await tx.task.updateMany({
+        where: { userId: dto.fromUserId },
+        data: { userId: dto.toUserId },
+      });
+
+      const transfer = await tx.taskTransfer.create({
+        data: {
+          fromUserId: dto.fromUserId,
+          toUserId: dto.toUserId,
+          taskCount: result.count,
+        },
+      });
+
+      return {
+        transferredTasks: result.count,
+        transferId: transfer.id,
+      };
+    });
   }
 }

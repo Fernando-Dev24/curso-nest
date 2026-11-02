@@ -398,7 +398,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
-  Task: 'Task'
+  Task: 'Task',
+  TaskTransfer: 'TaskTransfer'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -414,7 +415,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "task"
+    modelProps: "user" | "task" | "taskTransfer"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -566,6 +567,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TaskTransfer: {
+      payload: Prisma.$TaskTransferPayload<ExtArgs>
+      fields: Prisma.TaskTransferFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TaskTransferFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskTransferPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TaskTransferFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskTransferPayload>
+        }
+        findFirst: {
+          args: Prisma.TaskTransferFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskTransferPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TaskTransferFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskTransferPayload>
+        }
+        findMany: {
+          args: Prisma.TaskTransferFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskTransferPayload>[]
+        }
+        create: {
+          args: Prisma.TaskTransferCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskTransferPayload>
+        }
+        createMany: {
+          args: Prisma.TaskTransferCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TaskTransferCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskTransferPayload>[]
+        }
+        delete: {
+          args: Prisma.TaskTransferDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskTransferPayload>
+        }
+        update: {
+          args: Prisma.TaskTransferUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskTransferPayload>
+        }
+        deleteMany: {
+          args: Prisma.TaskTransferDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TaskTransferUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TaskTransferUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskTransferPayload>[]
+        }
+        upsert: {
+          args: Prisma.TaskTransferUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskTransferPayload>
+        }
+        aggregate: {
+          args: Prisma.TaskTransferAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTaskTransfer>
+        }
+        groupBy: {
+          args: Prisma.TaskTransferGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TaskTransferGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TaskTransferCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TaskTransferCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -624,6 +699,17 @@ export const TaskScalarFieldEnum = {
 export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
 
 
+export const TaskTransferScalarFieldEnum = {
+  id: 'id',
+  fromUserId: 'fromUserId',
+  toUserId: 'toUserId',
+  taskCount: 'taskCount',
+  createdAt: 'createdAt'
+} as const
+
+export type TaskTransferScalarFieldEnum = (typeof TaskTransferScalarFieldEnum)[keyof typeof TaskTransferScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -678,6 +764,20 @@ export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMod
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'DateTime'
+ */
+export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+/**
+ * Reference to a field of type 'DateTime[]'
+ */
+export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
     
 
 
@@ -847,6 +947,7 @@ export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaC
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   task?: Prisma.TaskOmit
+  taskTransfer?: Prisma.TaskTransferOmit
 }
 
 /* Types for Logging */
