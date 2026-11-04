@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { LoginDto } from './dto/login.dto.js';
 import { RegisterDto } from './dto/register.dto.js';
 import { handleHashPassword } from '../utils/salt-password.js';
@@ -13,8 +17,12 @@ export class AuthService {
     private readonly tokenService: TokensService,
   ) {}
 
-  getProfile(email: string) {
-    return this.authRepository.getProfile(email);
+  async getProfile(id: string) {
+    const user = await this.authRepository.getProfile(id);
+
+    if (!user) throw new NotFoundException('Tu usuario no se encontró');
+
+    return user;
   }
 
   async login(credentials: LoginDto) {

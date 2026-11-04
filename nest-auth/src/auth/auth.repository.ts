@@ -29,15 +29,22 @@ export class AuthRepository {
     });
   }
 
-  async getProfile(email: string) {
+  async getProfile(id: string) {
     return this.prisma.user.findUnique({
-      where: { email },
+      where: { id },
       select: {
         id: true,
         name: true,
         email: true,
         createdAt: true,
       },
+    });
+  }
+
+  async findById(id: string) {
+    return this.prisma.user.findUnique({
+      where: { id },
+      select: { id: true, email: true, role: true },
     });
   }
 }
