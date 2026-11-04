@@ -4,10 +4,14 @@ import { RegisterDto } from './dto/register.dto.js';
 import { handleHashPassword } from '../utils/salt-password.js';
 import { AuthRepository } from './auth.repository.js';
 import { handleVerifyPassword } from '../utils/verify-password.js';
+import { TokensService } from '../tokens/tokens.service.js';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly authRepository: AuthRepository) {}
+  constructor(
+    private readonly authRepository: AuthRepository,
+    private readonly tokenService: TokensService,
+  ) {}
 
   getProfile(email: string) {
     return this.authRepository.getProfile(email);
@@ -29,10 +33,14 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
+    const accessToken = await this.tokenService.createAccessToken(
+      user.id,
+      user.email,
+    );
     const { passwordHash, ...rest } = user;
 
     return {
-      accessToken: 'mock-access-token',
+      accessToken,
       user: { ...rest },
     };
   }
