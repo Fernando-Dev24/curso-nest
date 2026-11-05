@@ -10,9 +10,10 @@ import { PrismaExceptionFilter } from './prisma/prisma-filter.exception.js';
 import { JwtService } from '@nestjs/jwt';
 import { AdminModule } from './admin/admin.module.js';
 import { SessionService } from './session/session.service.js';
+import { SessionModule } from './session/session.module.js';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule, AdminModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule, AdminModule, SessionModule],
   controllers: [AppController],
   providers: [
     AppService,
