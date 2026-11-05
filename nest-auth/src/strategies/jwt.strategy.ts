@@ -7,6 +7,7 @@ import { AuthRepository } from '../auth/auth.repository.js';
 type JwtPayload = {
   sub: string;
   email: string;
+  sid: string;
 };
 
 @Injectable()
@@ -31,8 +32,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     if (!user) throw new UnauthorizedException();
 
     return {
-      id: payload.sub,
-      email: payload.email,
+      id: user.id,
+      email: user.email,
       role: user.role,
     };
   }

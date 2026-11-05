@@ -47,4 +47,16 @@ export class AuthRepository {
       select: { id: true, email: true, role: true },
     });
   }
+
+  async getAllUsers() {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        createdAt: true,
+      },
+    });
+  }
 }

@@ -8,9 +8,11 @@ import { PrismaModule } from './prisma/prisma.module.js';
 import { APP_FILTER } from '@nestjs/core';
 import { PrismaExceptionFilter } from './prisma/prisma-filter.exception.js';
 import { JwtService } from '@nestjs/jwt';
+import { AdminModule } from './admin/admin.module.js';
+import { SessionService } from './session/session.service.js';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule, AdminModule],
   controllers: [AppController],
   providers: [
     AppService,
@@ -20,6 +22,7 @@ import { JwtService } from '@nestjs/jwt';
       useClass: PrismaExceptionFilter,
     },
     JwtService,
+    SessionService,
   ],
 })
 export class AppModule {}
