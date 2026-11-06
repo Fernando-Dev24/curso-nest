@@ -78,4 +78,33 @@ export class AuthService {
       password,
     });
   }
+
+  async refreshToken(incomingToken: string) {
+    // * 1. Convertir el token a hash
+    const oldTokenHashed = this.tokenService.hashRefreshToken(incomingToken);
+    const newToken = this.tokenService.generateRefreshToken();
+    const newTokenHashed = this.tokenService.hashRefreshToken(newToken);
+
+    // * 2. Obtener la nueva cookie
+    const updatedSession = await this.sessionService.refreshSession(
+      oldTokenHashed,
+      newTokenHashed,
+    );
+
+    // * 3. Obtener y devolver el nuevo access token
+    const accessToken = await this.tokenService.createAccessToken(
+      updatedSession.user.id,
+      updatedSession.user.email,
+      updatedSession.id,
+    );
+
+    return {
+      accessToken,
+      newToken,
+      user: {
+        id: updatedSession.user.id,
+        email: updatedSession.user.email,
+      },
+    };
+  }
 }

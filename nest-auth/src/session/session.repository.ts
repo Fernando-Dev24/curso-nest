@@ -1,18 +1,15 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { addDays } from 'date-fns';
 
 @Injectable()
 export class SessionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createSession(userId: string, hashedToken: string) {
-    const EXPIRATION_DATE = addDays(new Date(), 7);
-
+  async createSession(userId: string, hashedToken: string, expiresAt: Date) {
     return this.prisma.session.create({
       data: {
         userId: userId,
-        expiresAt: EXPIRATION_DATE,
+        expiresAt: expiresAt,
         refreshTokenHash: hashedToken,
       },
     });
@@ -20,22 +17,34 @@ export class SessionRepository {
 
   async findSessionByHash(hashedToken: string) {
     return this.prisma.session.findUnique({
-      where: { refreshTokenHash: hashedToken },
+      where: {
+        refreshTokenHash: hashedToken,
+        revokedAt: null,
+        expiresAt: { gt: new Date() },
+      },
     });
   }
 
   async findSessionById(id: string) {
     return this.prisma.session.findUnique({
-      where: { id },
+      where: { id, revokedAt: null, expiresAt: { gt: new Date() } },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+          },
+        },
+      },
     });
   }
 
   async rotateRefreshToken(
     sessionId: string,
-    newHash: string,
     oldHash: string,
+    newHash: string,
   ) {
-    return this.prisma.$transaction(async (tx) => {
+    await this.prisma.$transaction(async (tx) => {
       const result = await tx.session.updateMany({
         where: {
           id: sessionId,
@@ -52,6 +61,7 @@ export class SessionRepository {
         throw new UnauthorizedException();
       }
 
+      // Marcar el viejo token como consumido
       await tx.consumedRefreshToken.create({
         data: {
           tokenHash: oldHash,
@@ -59,6 +69,9 @@ export class SessionRepository {
         },
       });
     });
+
+    // Obtener la session actualiza
+    return this.findSessionById(sessionId);
   }
 
   async detectTokenReutilization(tokenHash: string) {

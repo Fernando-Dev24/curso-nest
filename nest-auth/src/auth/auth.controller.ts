@@ -1,4 +1,12 @@
-import { Controller, Post, Body, UseGuards, Get, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Get,
+  Res,
+  Cookies,
+} from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { type LoginDto, loginSchema } from './dto/login.dto.js';
 import { type RegisterDto, registerSchema } from './dto/register.dto.js';
@@ -28,7 +36,7 @@ export class AuthController {
     const { user, accessToken, refreshToken } =
       await this.authService.login(credentials);
 
-    this.adapterHost.httpAdapter.setCookie(res, 'refresh-token', refreshToken, {
+    this.adapterHost.httpAdapter.setCookie(res, 'refreshToken', refreshToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
@@ -42,5 +50,10 @@ export class AuthController {
   @Post('register')
   register(@Body({ schema: registerSchema }) body: RegisterDto) {
     return this.authService.register(body);
+  }
+
+  @Post('refresh')
+  async refresh(@Cookies('refreshToken') refreshToken?: string) {
+    const {} = await this.authService.refreshToken(refreshToken);
   }
 }
