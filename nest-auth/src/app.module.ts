@@ -11,9 +11,16 @@ import { JwtService } from '@nestjs/jwt';
 import { AdminModule } from './admin/admin.module.js';
 import { SessionService } from './session/session.service.js';
 import { SessionModule } from './session/session.module.js';
+import { SessionRepository } from './session/session.repository.js';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule, AdminModule, SessionModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    AuthModule,
+    PrismaModule,
+    AdminModule,
+    SessionModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
@@ -24,6 +31,7 @@ import { SessionModule } from './session/session.module.js';
     },
     JwtService,
     SessionService,
+    SessionRepository,
   ],
 })
 export class AppModule {}

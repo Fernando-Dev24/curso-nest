@@ -55,16 +55,17 @@ export class AuthService {
     );
 
     // * GENERAR EL ACCESS TOKEN
-
     const accessToken = await this.tokenService.createAccessToken(
       user.id,
       user.email,
       session.id,
     );
+
     const { passwordHash, ...rest } = user;
 
     return {
       accessToken,
+      refreshToken,
       user: { ...rest },
     };
   }
