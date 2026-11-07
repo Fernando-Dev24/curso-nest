@@ -6,7 +6,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
 
   // Habilitar ZOD
-  app.useGlobalPipes(new StandardSchemaValidationPipe());
+  app.useGlobalPipes(
+    new StandardSchemaValidationPipe({ validateCustomDecorators: true }),
+  );
 
   // Habilitar proteccion contra RCSF
   app.enableCsrfProtection();

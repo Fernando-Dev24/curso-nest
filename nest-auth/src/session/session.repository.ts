@@ -44,7 +44,7 @@ export class SessionRepository {
     oldHash: string,
     newHash: string,
   ) {
-    await this.prisma.$transaction(async (tx) => {
+    const rotated = await this.prisma.$transaction(async (tx) => {
       const result = await tx.session.updateMany({
         where: {
           id: sessionId,
@@ -58,7 +58,7 @@ export class SessionRepository {
       });
 
       if (result.count !== 1) {
-        throw new UnauthorizedException();
+        return false;
       }
 
       // Marcar el viejo token como consumido
@@ -68,7 +68,13 @@ export class SessionRepository {
           sessionId: sessionId,
         },
       });
+
+      return true;
     });
+
+    if (!rotated) {
+      return null;
+    }
 
     // Obtener la session actualiza
     return this.findSessionById(sessionId);

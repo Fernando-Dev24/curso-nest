@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthRepository } from '../auth/auth.repository.js';
+import { SessionRepository } from '../session/session.repository.js';
 
 type JwtPayload = {
   sub: string;
@@ -15,6 +16,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     configService: ConfigService,
     private readonly authRepository: AuthRepository,
+    private readonly sessionRepository: SessionRepository,
   ) {
     const secret = configService.getOrThrow<string>('JWT_SECRET');
 
@@ -27,9 +29,18 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: JwtPayload) {
-    const user = await this.authRepository.findById(payload.sub);
+    if (!payload.sub || !payload.sid) {
+      throw new UnauthorizedException();
+    }
 
-    if (!user) throw new UnauthorizedException();
+    const [user, session] = await Promise.all([
+      this.authRepository.findById(payload.sub),
+      this.sessionRepository.findSessionById(payload.sid),
+    ]);
+
+    if (!user || !session || session.userId !== user.id) {
+      throw new UnauthorizedException();
+    }
 
     return {
       id: user.id,

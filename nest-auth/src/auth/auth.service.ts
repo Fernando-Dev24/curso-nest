@@ -79,7 +79,11 @@ export class AuthService {
     });
   }
 
-  async refreshToken(incomingToken: string) {
+  async refreshToken(incomingToken?: string) {
+    if (!incomingToken) {
+      throw new UnauthorizedException();
+    }
+
     // * 1. Convertir el token a hash
     const oldTokenHashed = this.tokenService.hashRefreshToken(incomingToken);
     const newToken = this.tokenService.generateRefreshToken();
@@ -98,6 +102,11 @@ export class AuthService {
       updatedSession.id,
     );
 
+    const remainingMs = Math.max(
+      0,
+      updatedSession.expiresAt.getTime() - Date.now(),
+    );
+
     return {
       accessToken,
       newToken,
@@ -105,6 +114,17 @@ export class AuthService {
         id: updatedSession.user.id,
         email: updatedSession.user.email,
       },
+      remainingMs,
     };
+  }
+
+  async logout(incomingToken?: string) {
+    if (!incomingToken) return;
+
+    // * 1. Convertir el token a hash
+    const tokenHashed = this.tokenService.hashRefreshToken(incomingToken);
+
+    // * 2. Revocar la sesion
+    await this.sessionService.logout(tokenHashed);
   }
 }

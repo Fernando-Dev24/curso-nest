@@ -6,6 +6,8 @@ import {
   Get,
   Res,
   Cookies,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { type LoginDto, loginSchema } from './dto/login.dto.js';
@@ -53,7 +55,36 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refresh(@Cookies('refreshToken') refreshToken?: string) {
-    const {} = await this.authService.refreshToken(refreshToken);
+  async refresh(
+    @Res({ passthrough: true }) res: unknown,
+    @Cookies('refreshToken') refreshToken?: string,
+  ) {
+    const { accessToken, user, newToken, remainingMs } =
+      await this.authService.refreshToken(refreshToken);
+
+    this.adapterHost.httpAdapter.setCookie(res, 'refreshToken', newToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      path: '/auth',
+      maxAge: remainingMs,
+    });
+
+    return {
+      accessToken,
+      user,
+    };
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(
+    @Res({ passthrough: true }) res: unknown,
+    @Cookies('refreshToken') refreshToken?: string,
+  ) {
+    this.adapterHost.httpAdapter.clearCookie(res, 'refreshToken', {
+      path: '/auth',
+    });
+    return this.authService.logout(refreshToken);
   }
 }

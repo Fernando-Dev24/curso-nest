@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { SessionRepository } from './session.repository.js';
 import { addDays } from 'date-fns';
-import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class SessionService {
@@ -19,36 +18,45 @@ export class SessionService {
 
   async refreshSession(oldToken: string, newToken: string) {
     // 1. Validar que la session no este expirada o revocada
-    const [session, consumedToken] = await Promise.all([
-      await this.sessionRepository.findSessionByHash(oldToken),
-      await this.sessionRepository.detectTokenReutilization(oldToken),
-    ]);
+    const session = await this.sessionRepository.findSessionByHash(oldToken);
 
-    // 2. Sesion no encontrada pero token consumido = reutilizacion de token
+    // 2. Si no existe, investigar si el token fue consumido
     if (!session) {
-      if (consumedToken) {
-        await this.sessionRepository.revokedSession(consumedToken.sessionId);
-      }
-
-      throw new UnauthorizedException('Tu sesión ha expirado.');
+      return await this.handleInvalidRefreshToken(oldToken);
     }
 
-    // 3. Sesion no encontrada y token no consumido = No existe el token en ninguna tabla
-    if (!session || !consumedToken) {
-      throw new UnauthorizedException('Tu sesión ha expirado.');
-    }
-
-    // 4. Rotar token
+    // 3. Rotar token
     const updatedSession = await this.sessionRepository.rotateRefreshToken(
       session.id,
       oldToken,
       newToken,
     );
 
+    // 4. La rotación pudo fallar por una petición concurrente
     if (!updatedSession) {
-      throw new NotFoundException('No se encontró tu sesión');
+      return await this.handleInvalidRefreshToken(oldToken);
     }
 
     return updatedSession;
+  }
+
+  async logout(tokenHashed: string) {
+    // Obtener la sesion por token
+    const session = await this.sessionRepository.findSessionByHash(tokenHashed);
+
+    if (!session) return;
+
+    return this.sessionRepository.revokedSession(session?.id);
+  }
+
+  private async handleInvalidRefreshToken(tokenHash: string): Promise<never> {
+    const consumedToken =
+      await this.sessionRepository.detectTokenReutilization(tokenHash);
+
+    if (consumedToken) {
+      await this.sessionRepository.revokedSession(consumedToken.sessionId);
+    }
+
+    throw new UnauthorizedException('Refresh token invalido o expirado');
   }
 }
